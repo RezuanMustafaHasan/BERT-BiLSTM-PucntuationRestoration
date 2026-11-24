@@ -8,12 +8,36 @@ BanglaBERT aligns subword representations to words. The BiLSTM uses a shared
 fastText embedding cache. Both models use constrained gap decoding and a common
 renderer to turn predicted labels into punctuated text.
 
+## Trained models
+
+| Model | API value | Architecture | Git LFS checkpoint |
+|---|---|---|---|
+| Aligned BanglaBERT | `bert` | Fine-tuned BanglaBERT (ELECTRA) with subword-to-word pooling | [best.pt](inference/models/banglabert/best.pt) (422 MiB) |
+| Packed fastText–BiLSTM | `bilstm` | Two-layer bidirectional LSTM with frozen 300-dimensional fastText embeddings | [best.pt](inference/models/bilstm/best.pt) (8.4 MiB) |
+
+Run `git lfs pull` from the repository root to fetch both checkpoints and the
+[fastText embedding cache](inference/embeddings/cache) used by the BiLSTM.
+Checkpoint sizes cover the weights alone.
+
 ## Evaluation
 
-The repository includes [model and training notes](report_materials/report_materials/README.md)
-and [exploratory benchmark results](report_materials/report_materials/metrics_and_benchmarks/test_benchmark_report.md).
-The table compares configurations on a reused evaluation set. It does not report
-performance on a fresh holdout.
+| Evaluation split | Model | Macro-F1 (%) | Micro-F1 (%) | Ordered exact match (%) |
+|---|---|---:|---:|---:|
+| Validation | Aligned BanglaBERT | 68.58 | 93.05 | 83.74 |
+| Validation | Packed fastText–BiLSTM | 50.32 | 89.61 | 77.81 |
+| Reused benchmark | Aligned BanglaBERT | 68.93 | 92.96 | 83.46 |
+| Reused benchmark | Packed fastText–BiLSTM | 52.05 | 89.77 | 77.93 |
+
+Macro-F1 gives each punctuation class equal weight. Ordered exact match is the
+percentage of sentences whose punctuation sequences match the reference in
+every gap.
+
+The benchmark covers 185,370 sentences from a previously used evaluation set.
+Treat these scores as exploratory. See the
+[benchmark report](report_materials/report_materials/metrics_and_benchmarks/test_benchmark_report.md)
+for additional configurations and parenthesis span scores, and the
+[model and training notes](report_materials/report_materials/README.md)
+for validation results by punctuation mark.
 
 ## Run locally
 
